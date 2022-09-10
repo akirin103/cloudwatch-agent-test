@@ -1,0 +1,16 @@
+#cloud-config
+timezone: Asia/Tokyo
+locale: ja_JP.utf8
+package_upgrade: true
+write_files:
+ - encoding: b64
+   path: /etc/cloudwatch_agent.json
+   content: ${cloudwatch_agent_config}
+runcmd:
+  - yum install -y amazon-cloudwatch-agent
+  - systemctl enable amazon-cloudwatch-agent
+  - amazon-linux-extras install epel
+  - yum-config-manager -enable epel
+  - yum install -y collectd
+  - /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/etc/cloudwatch_agent.json -s
+  - systemctl status amazon-cloudwatch-agent
